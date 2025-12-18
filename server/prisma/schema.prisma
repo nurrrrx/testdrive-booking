@@ -1,0 +1,315 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== ENUMS ====================
+
+enum UserRole {
+  CUSTOMER
+  CALL_CENTER_AGENT
+  SALES_EXECUTIVE
+  SHOWROOM_MANAGER
+  ADMIN
+}
+
+enum FuelType {
+  PETROL
+  DIESEL
+  HYBRID
+  ELECTRIC
+}
+
+enum Transmission {
+  MANUAL
+  AUTOMATIC
+}
+
+enum CarUnitStatus {
+  AVAILABLE
+  OUT_FOR_TEST_DRIVE
+  MAINTENANCE
+  SOLD
+  IN_TRANSIT
+  RESERVED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  NO_SHOW
+  CANCELLED
+}
+
+enum BookingSource {
+  WEB
+  MOBILE_APP
+  CALL_CENTER
+  WALK_IN
+}
+
+enum TransferStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  IN_TRANSIT
+  COMPLETED
+  CANCELLED
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  LOST
+}
+
+enum NotificationChannel {
+  WHATSAPP
+  SMS
+  EMAIL
+  PUSH
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+  MOCK
+}
+
+// ==================== MODELS ====================
+
+model Showroom {
+  id             String   @id @default(uuid())
+  name           String
+  address        String
+  city           String
+  latitude       Float
+  longitude      Float
+  phone          String
+  email          String
+  operatingHours Json     // Array of { dayOfWeek, openTime, closeTime, isClosed }
+  imageUrl       String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  carUnits               CarUnit[]
+  users                  User[]
+  bookings               Booking[]
+  transfersFrom          CarTransferRequest[] @relation("TransferFrom")
+  transfersTo            CarTransferRequest[] @relation("TransferTo")
+  leads                  Lead[]               @relation("PreferredShowroom")
+
+  @@index([city])
+  @@index([isActive])
+}
+
+model CarModel {
+  id                      String       @id @default(uuid())
+  brand                   String
+  model                   String
+  year                    Int
+  variant                 String?
+  fuelType                FuelType
+  transmission            Transmission
+  imageUrl                String?
+  thumbnailUrl            String?
+  specs                   Json?        // { engineCapacity, power, torque, etc. }
+  isAvailableForTestDrive Boolean      @default(true)
+  createdAt               DateTime     @default(now())
+  updatedAt               DateTime     @updatedAt
+
+  // Relations
+  carUnits       CarUnit[]
+  interestedLeads Lead[]
+
+  @@unique([brand, model, year, variant])
+  @@index([brand])
+  @@index([fuelType])
+  @@index([isAvailableForTestDrive])
+}
+
+model CarUnit {
+  id          String        @id @default(uuid())
+  carModelId  String
+  showroomId  String
+  vin         String?       @unique
+  color       String?
+  status      CarUnitStatus @default(AVAILABLE)
+  isDemoOnly  Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  carModel         CarModel             @relation(fields: [carModelId], references: [id])
+  showroom         Showroom             @relation(fields: [showroomId], references: [id])
+  bookings         Booking[]
+  transferRequests CarTransferRequest[]
+
+  @@index([showroomId, status])
+  @@index([carModelId])
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String?   @unique
+  phone        String?   @unique
+  passwordHash String?
+  ssoId        String?   @unique
+  firstName    String?
+  lastName     String?
+  role         UserRole
+  showroomId   String?
+  avatarUrl    String?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relations
+  showroom                    Showroom?            @relation(fields: [showroomId], references: [id])
+  customerBookings            Booking[]            @relation("CustomerBookings")
+  salesExecBookings           Booking[]            @relation("SalesExecBookings")
+  schedules                   SalesExecSchedule[]
+  transferRequestsCreated     CarTransferRequest[] @relation("TransferRequestedBy")
+  transferRequestsApproved    CarTransferRequest[] @relation("TransferApprovedBy")
+  assignedLeads               Lead[]               @relation("LeadAssignedTo")
+
+  @@index([role])
+  @@index([showroomId])
+  @@index([isActive])
+}
+
+model SalesExecSchedule {
+  id            String   @id @default(uuid())
+  userId        String
+  date          DateTime @db.Date
+  availableFrom String   // HH:mm
+  availableTo   String   // HH:mm
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
+model Booking {
+  id                 String        @id @default(uuid())
+  referenceNumber    String        @unique
+  showroomId         String
+  carUnitId          String
+  customerId         String
+  salesExecId        String?
+  date               DateTime      @db.Date
+  startTime          String        // HH:mm
+  endTime            String        // HH:mm
+  status             BookingStatus @default(PENDING)
+  source             BookingSource @default(WEB)
+  notes              String?
+  cancellationReason String?
+  confirmedAt        DateTime?
+  completedAt        DateTime?
+  cancelledAt        DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  version            Int           @default(1) // For optimistic locking
+
+  // Relations
+  showroom         Showroom          @relation(fields: [showroomId], references: [id])
+  carUnit          CarUnit           @relation(fields: [carUnitId], references: [id])
+  customer         User              @relation("CustomerBookings", fields: [customerId], references: [id])
+  salesExec        User?             @relation("SalesExecBookings", fields: [salesExecId], references: [id])
+  notificationLogs NotificationLog[]
+  convertedLead    Lead?
+
+  @@index([showroomId, date])
+  @@index([customerId])
+  @@index([salesExecId])
+  @@index([status])
+  @@index([referenceNumber])
+}
+
+model CarTransferRequest {
+  id              String         @id @default(uuid())
+  carUnitId       String
+  fromShowroomId  String
+  toShowroomId    String
+  requestedById   String
+  approvedById    String?
+  requestedDate   DateTime       @db.Date
+  status          TransferStatus @default(PENDING)
+  notes           String?
+  approvedAt      DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Relations
+  carUnit      CarUnit  @relation(fields: [carUnitId], references: [id])
+  fromShowroom Showroom @relation("TransferFrom", fields: [fromShowroomId], references: [id])
+  toShowroom   Showroom @relation("TransferTo", fields: [toShowroomId], references: [id])
+  requestedBy  User     @relation("TransferRequestedBy", fields: [requestedById], references: [id])
+  approvedBy   User?    @relation("TransferApprovedBy", fields: [approvedById], references: [id])
+
+  @@index([fromShowroomId, status])
+  @@index([toShowroomId, status])
+}
+
+model Lead {
+  id                   String     @id @default(uuid())
+  firstName            String
+  lastName             String
+  phone                String
+  email                String?
+  source               String     // "website", "social_media", "referral", etc.
+  interestedCarModelId String?
+  preferredShowroomId  String?
+  assignedToId         String?
+  status               LeadStatus @default(NEW)
+  notes                String?
+  convertedBookingId   String?    @unique
+  convertedAt          DateTime?
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+
+  // Relations
+  interestedCarModel CarModel? @relation(fields: [interestedCarModelId], references: [id])
+  preferredShowroom  Showroom? @relation("PreferredShowroom", fields: [preferredShowroomId], references: [id])
+  assignedTo         User?     @relation("LeadAssignedTo", fields: [assignedToId], references: [id])
+  convertedBooking   Booking?  @relation(fields: [convertedBookingId], references: [id])
+
+  @@index([status])
+  @@index([assignedToId])
+  @@index([source])
+}
+
+model NotificationLog {
+  id        String              @id @default(uuid())
+  bookingId String
+  type      String              // "BOOKING_CONFIRMATION", "REMINDER", etc.
+  channel   NotificationChannel
+  recipient String
+  message   String
+  status    NotificationStatus  @default(PENDING)
+  sentAt    DateTime?
+  error     String?
+  createdAt DateTime            @default(now())
+
+  // Relations
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@index([type])
+}

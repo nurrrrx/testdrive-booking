@@ -1,0 +1,285 @@
+/* Helvetica Neue Font Stack */
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  /* Lexus Gold Color */
+  --color-lexus-gold: #c4a052;
+  --color-lexus-gold-light: #d4b672;
+  --color-lexus-gold-dark: #a48842;
+}
+
+:root {
+  --radius: 0.25rem;
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  --primary: #1a1a1a;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #1a1a1a;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
+  --accent: #1a1a1a;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --border: #e5e5e5;
+  --input: #e5e5e5;
+  --ring: #1a1a1a;
+  --chart-1: #c4a052;
+  --chart-2: #1a1a1a;
+  --chart-3: #737373;
+  --chart-4: #e5e5e5;
+  --chart-5: #f5f5f5;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1a1a1a;
+  --sidebar-primary: #1a1a1a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f5f5f5;
+  --sidebar-accent-foreground: #1a1a1a;
+  --sidebar-border: #e5e5e5;
+  --sidebar-ring: #1a1a1a;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --card: #1a1a1a;
+  --card-foreground: #fafafa;
+  --popover: #1a1a1a;
+  --popover-foreground: #fafafa;
+  --primary: #fafafa;
+  --primary-foreground: #0a0a0a;
+  --secondary: #262626;
+  --secondary-foreground: #fafafa;
+  --muted: #262626;
+  --muted-foreground: #a3a3a3;
+  --accent: #262626;
+  --accent-foreground: #fafafa;
+  --destructive: #dc2626;
+  --border: #262626;
+  --input: #262626;
+  --ring: #fafafa;
+  --chart-1: #c4a052;
+  --chart-2: #fafafa;
+  --chart-3: #a3a3a3;
+  --chart-4: #262626;
+  --chart-5: #1a1a1a;
+  --sidebar: #1a1a1a;
+  --sidebar-foreground: #fafafa;
+  --sidebar-primary: #c4a052;
+  --sidebar-primary-foreground: #0a0a0a;
+  --sidebar-accent: #262626;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: #262626;
+  --sidebar-ring: #fafafa;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Lexus Custom Styles */
+.lexus-heading {
+  font-weight: 300;
+  letter-spacing: 0.02em;
+}
+
+.lexus-subheading {
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+.lexus-btn {
+  @apply inline-flex items-center justify-center px-8 py-3 text-sm font-medium tracking-wider uppercase transition-all duration-300;
+}
+
+.lexus-btn-primary {
+  @apply bg-primary text-primary-foreground hover:bg-primary/90;
+}
+
+.lexus-btn-outline {
+  @apply border border-current bg-transparent hover:bg-primary hover:text-primary-foreground;
+}
+
+.lexus-btn-gold {
+  background-color: var(--color-lexus-gold);
+  color: #1a1a1a;
+}
+
+.lexus-btn-gold:hover {
+  background-color: var(--color-lexus-gold-dark);
+}
+
+/* Hero Video/Image Overlay */
+.hero-overlay {
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%);
+}
+
+/* Model Card Hover Effects */
+.model-card {
+  @apply transition-all duration-500 ease-out;
+}
+
+.model-card:hover {
+  @apply transform -translate-y-1;
+}
+
+.model-card:hover .model-image {
+  @apply scale-105;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Category Filter Pills */
+.category-pill {
+  @apply px-6 py-2 text-sm font-medium tracking-wide transition-all duration-300 cursor-pointer;
+}
+
+.category-pill.active {
+  @apply border-b-2 border-primary;
+}
+
+/* Price Tag Styling */
+.price-tag {
+  @apply text-sm text-muted-foreground;
+}
+
+.price-value {
+  @apply text-lg font-semibold;
+}
+
+/* Navigation Styles */
+.nav-link {
+  @apply relative text-sm font-medium tracking-wide uppercase transition-colors duration-300;
+}
+
+.nav-link::after {
+  content: '';
+  @apply absolute bottom-0 left-0 w-0 h-0.5 bg-current transition-all duration-300;
+}
+
+.nav-link:hover::after {
+  @apply w-full;
+}
+
+/* Form Input Styles */
+.lexus-input {
+  @apply w-full px-4 py-3 border border-border bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors duration-300;
+}
+
+.lexus-select {
+  @apply w-full px-4 py-3 border border-border bg-transparent text-foreground focus:outline-none focus:border-primary transition-colors duration-300 appearance-none cursor-pointer;
+}
+
+/* Calendar Styles */
+.lexus-calendar-day {
+  @apply w-10 h-10 flex items-center justify-center rounded-none cursor-pointer transition-colors duration-200;
+}
+
+.lexus-calendar-day:hover:not(.disabled) {
+  @apply bg-primary text-primary-foreground;
+}
+
+.lexus-calendar-day.selected {
+  @apply bg-primary text-primary-foreground;
+}
+
+.lexus-calendar-day.disabled {
+  @apply text-muted-foreground/50 cursor-not-allowed;
+}
+
+/* Time Slot Styles */
+.time-slot {
+  @apply px-4 py-2 border border-border text-center cursor-pointer transition-all duration-200;
+}
+
+.time-slot:hover:not(.disabled) {
+  @apply border-primary bg-primary/5;
+}
+
+.time-slot.selected {
+  @apply border-primary bg-primary text-primary-foreground;
+}
+
+.time-slot.disabled {
+  @apply bg-muted text-muted-foreground/50 cursor-not-allowed;
+}
+
+/* Animation for page transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Lexus Spindle Grille Pattern (decorative) */
+.spindle-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30z' fill='none' stroke='%23e5e5e5' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 30px 30px;
+}
