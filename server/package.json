@@ -22,7 +22,12 @@
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node prisma/seed.ts"
   },
-  "keywords": ["nestjs", "test-drive", "booking", "dealership"],
+  "keywords": [
+    "nestjs",
+    "test-drive",
+    "booking",
+    "dealership"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -48,7 +53,7 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "swagger-ui-express": "^5.0.1",
-    "uuid": "^13.0.0"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.14",
@@ -60,7 +65,7 @@
     "@types/node": "^25.0.3",
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",
-    "@types/uuid": "^10.0.0",
+    "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^8.50.0",
     "@typescript-eslint/parser": "^8.50.0",
     "eslint": "^9.39.2",
