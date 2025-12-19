@@ -12,7 +12,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AvailabilityService } from '../availability/availability.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { CreateBookingDto, RescheduleBookingDto } from './dto/bookings.dto';
-import { BookingStatus, BookingSource } from '@prisma/client';
+import { BookingStatus, BookingSource, CarUnitStatus } from '@prisma/client';
 
 @Injectable()
 export class BookingsService {
@@ -127,6 +127,12 @@ export class BookingsService {
           customer: true,
           salesExec: true,
         },
+      });
+
+      // Mark car as RESERVED
+      await this.prisma.carUnit.update({
+        where: { id: carUnit.id },
+        data: { status: CarUnitStatus.RESERVED },
       });
 
       // Release the hold if it was provided
@@ -261,6 +267,14 @@ export class BookingsService {
       },
     });
 
+    // Release car back to AVAILABLE
+    if (booking.carUnitId) {
+      await this.prisma.carUnit.update({
+        where: { id: booking.carUnitId },
+        data: { status: CarUnitStatus.AVAILABLE },
+      });
+    }
+
     // Send cancellation notification
     await this.notificationsService.sendBookingCancellation(updated);
 
@@ -313,7 +327,7 @@ export class BookingsService {
       throw new BadRequestException('Can only complete confirmed bookings');
     }
 
-    return this.prisma.booking.update({
+    const updated = await this.prisma.booking.update({
       where: { id },
       data: {
         status: BookingStatus.COMPLETED,
@@ -321,6 +335,16 @@ export class BookingsService {
         notes: notes || booking.notes,
       },
     });
+
+    // Release car back to AVAILABLE
+    if (booking.carUnitId) {
+      await this.prisma.carUnit.update({
+        where: { id: booking.carUnitId },
+        data: { status: CarUnitStatus.AVAILABLE },
+      });
+    }
+
+    return updated;
   }
 
   async markNoShow(id: string) {
@@ -330,11 +354,21 @@ export class BookingsService {
       throw new BadRequestException('Can only mark confirmed bookings as no-show');
     }
 
-    return this.prisma.booking.update({
+    const updated = await this.prisma.booking.update({
       where: { id },
       data: {
         status: BookingStatus.NO_SHOW,
       },
     });
+
+    // Release car back to AVAILABLE
+    if (booking.carUnitId) {
+      await this.prisma.carUnit.update({
+        where: { id: booking.carUnitId },
+        data: { status: CarUnitStatus.AVAILABLE },
+      });
+    }
+
+    return updated;
   }
 }
