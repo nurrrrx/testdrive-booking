@@ -41,7 +41,7 @@ export class SchedulingController {
   }
 
   @Get('team')
-  @Roles(UserRole.SHOWROOM_MANAGER)
+  @Roles(UserRole.SHOWROOM_MANAGER, UserRole.ADMIN)
   @ApiOperation({ summary: 'Get team schedule for showroom manager' })
   @ApiQuery({ name: 'startDate', required: true })
   @ApiQuery({ name: 'endDate', required: true })
@@ -61,7 +61,7 @@ export class SchedulingController {
   }
 
   @Post('availability')
-  @Roles(UserRole.SALES_EXECUTIVE, UserRole.SHOWROOM_MANAGER)
+  @Roles(UserRole.SALES_EXECUTIVE, UserRole.SHOWROOM_MANAGER, UserRole.ADMIN)
   @ApiOperation({ summary: 'Set availability for a date' })
   async setAvailability(
     @CurrentUser() user: CurrentUserData,
@@ -74,7 +74,7 @@ export class SchedulingController {
     },
   ) {
     const targetUserId =
-      user.role === UserRole.SHOWROOM_MANAGER && body.userId
+      (user.role === UserRole.SHOWROOM_MANAGER || user.role === UserRole.ADMIN) && body.userId
         ? body.userId
         : user.id;
 
@@ -87,14 +87,14 @@ export class SchedulingController {
   }
 
   @Delete('availability')
-  @Roles(UserRole.SALES_EXECUTIVE, UserRole.SHOWROOM_MANAGER)
+  @Roles(UserRole.SALES_EXECUTIVE, UserRole.SHOWROOM_MANAGER, UserRole.ADMIN)
   @ApiOperation({ summary: 'Remove availability for a date' })
   async removeAvailability(
     @CurrentUser() user: CurrentUserData,
     @Body() body: { userId?: string; date: string },
   ) {
     const targetUserId =
-      user.role === UserRole.SHOWROOM_MANAGER && body.userId
+      (user.role === UserRole.SHOWROOM_MANAGER || user.role === UserRole.ADMIN) && body.userId
         ? body.userId
         : user.id;
 
