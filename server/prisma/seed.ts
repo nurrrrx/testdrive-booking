@@ -51,6 +51,9 @@ async function main() {
 
   console.log('Created showrooms');
 
+  // Base URL for images - using the deployed Vercel URL
+  const webBaseUrl = 'https://testdrive-booking-web.vercel.app';
+
   // Create Lexus Car Models
   const lexusLX = await prisma.carModel.create({
     data: {
@@ -60,8 +63,8 @@ async function main() {
       variant: 'Ultra Luxury',
       fuelType: FuelType.HYBRID,
       transmission: Transmission.AUTOMATIC,
-      imageUrl: 'https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=800',
-      thumbnailUrl: 'https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=400',
+      imageUrl: `${webBaseUrl}/lx700-hero.jpeg`,
+      thumbnailUrl: `${webBaseUrl}/lx700-hero.jpeg`,
       specs: {
         engineCapacity: '3.5L V6 Twin-Turbo Hybrid',
         power: '480 HP Combined',
@@ -81,8 +84,8 @@ async function main() {
       variant: 'F Sport',
       fuelType: FuelType.HYBRID,
       transmission: Transmission.AUTOMATIC,
-      imageUrl: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800',
-      thumbnailUrl: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=400',
+      imageUrl: `${webBaseUrl}/rx350-hero.jpeg`,
+      thumbnailUrl: `${webBaseUrl}/rx350-hero.jpeg`,
       specs: {
         engineCapacity: '2.5L 4-Cylinder Hybrid',
         power: '246 HP Combined',
@@ -102,8 +105,8 @@ async function main() {
       variant: 'Luxury',
       fuelType: FuelType.PETROL,
       transmission: Transmission.AUTOMATIC,
-      imageUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800',
-      thumbnailUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400',
+      imageUrl: `${webBaseUrl}/rcf-hero.jpeg`,
+      thumbnailUrl: `${webBaseUrl}/rcf-hero.jpeg`,
       specs: {
         engineCapacity: '3.5L V6',
         power: '302 HP',

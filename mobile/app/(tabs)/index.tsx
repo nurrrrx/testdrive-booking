@@ -93,7 +93,16 @@ export default function BookingsScreen() {
   };
 
   const handleWhatsApp = (booking: Booking) => {
-    const phone = booking.customer.phone.replace(/\D/g, '');
+    // Remove any non-digit characters
+    let phone = booking.customer.phone.replace(/\D/g, '');
+    // If phone starts with 0, replace with UAE country code 971
+    if (phone.startsWith('0')) {
+      phone = '971' + phone.substring(1);
+    }
+    // If phone doesn't start with country code, add UAE code
+    if (!phone.startsWith('971') && phone.length <= 10) {
+      phone = '971' + phone;
+    }
     const message = `Hi ${booking.customer.firstName}, this is regarding your test drive booking scheduled for ${format(selectedDate, 'MMMM d')} at ${booking.startTime}.`;
     Linking.openURL(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`);
   };

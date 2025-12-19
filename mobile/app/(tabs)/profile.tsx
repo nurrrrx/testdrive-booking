@@ -93,42 +93,11 @@ export default function ProfileScreen() {
         </View>
       </View>
 
-      {/* App Info */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>App Information</Text>
-
-        <View style={styles.infoCard}>
-          <View style={styles.infoRow}>
-            <View style={styles.infoIcon}>
-              <Ionicons name="information-circle-outline" size={20} color="#666" />
-            </View>
-            <View style={styles.infoContent}>
-              <Text style={styles.infoLabel}>Version</Text>
-              <Text style={styles.infoValue}>
-                {Constants.expoConfig?.version || '1.0.0'}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.infoRow}>
-            <View style={styles.infoIcon}>
-              <Ionicons name="car-sport-outline" size={20} color="#666" />
-            </View>
-            <View style={styles.infoContent}>
-              <Text style={styles.infoLabel}>App Name</Text>
-              <Text style={styles.infoValue}>TestDrive Staff</Text>
-            </View>
-          </View>
-        </View>
-      </View>
-
-      {/* Logout Button */}
+      {/* Logout Button - Always visible */}
       <View style={styles.logoutContainer}>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={20} color="#ef4444" />
-          <Text style={styles.logoutText}>Logout</Text>
+          <Ionicons name="log-out-outline" size={24} color="#fff" />
+          <Text style={styles.logoutText}>Sign Out</Text>
         </TouchableOpacity>
       </View>
 
@@ -224,23 +193,21 @@ const styles = StyleSheet.create({
   },
   logoutContainer: {
     paddingHorizontal: 16,
-    paddingTop: 32,
+    paddingTop: 24,
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#ef4444',
     borderRadius: 12,
     padding: 16,
-    gap: 8,
-    borderWidth: 1,
-    borderColor: '#ef4444',
+    gap: 10,
   },
   logoutText: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
-    color: '#ef4444',
+    color: '#fff',
   },
   footer: {
     textAlign: 'center',
