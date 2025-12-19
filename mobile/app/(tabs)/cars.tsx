@@ -8,6 +8,8 @@ import {
   RefreshControl,
   TextInput,
   Alert,
+  ScrollView,
+  Image,
 } from 'react-native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
@@ -84,36 +86,53 @@ export default function CarsScreen() {
 
   const renderCar = ({ item }: { item: CarUnit }) => (
     <TouchableOpacity style={styles.carCard} onPress={() => handleStatusChange(item)}>
-      <View style={styles.carHeader}>
-        <View>
-          <Text style={styles.carName}>
-            {item.carModel.brand} {item.carModel.model}
-          </Text>
-          <Text style={styles.carYear}>{item.carModel.year} • {item.carModel.variant}</Text>
-        </View>
-        <View style={[styles.statusBadge, { backgroundColor: STATUS_COLORS[item.status] + '20' }]}>
-          <Text style={[styles.statusText, { color: STATUS_COLORS[item.status] }]}>
-            {item.status.replace(/_/g, ' ')}
-          </Text>
-        </View>
-      </View>
+      <View style={styles.carContent}>
+        {/* Car Image */}
+        {item.carModel.imageUrl ? (
+          <Image
+            source={{ uri: item.carModel.imageUrl }}
+            style={styles.carImage}
+            resizeMode="cover"
+          />
+        ) : (
+          <View style={styles.carImagePlaceholder}>
+            <Ionicons name="car-sport" size={40} color="#ccc" />
+          </View>
+        )}
 
-      <View style={styles.carDetails}>
-        {item.vin && (
-          <View style={styles.detailRow}>
-            <Ionicons name="barcode-outline" size={14} color="#666" />
-            <Text style={styles.detailText}>{item.vin}</Text>
+        <View style={styles.carInfo}>
+          <View style={styles.carHeader}>
+            <View style={styles.carHeaderText}>
+              <Text style={styles.carName}>
+                {item.carModel.brand} {item.carModel.model}
+              </Text>
+              <Text style={styles.carYear}>{item.carModel.year} • {item.carModel.variant || 'Standard'}</Text>
+            </View>
+            <View style={[styles.statusBadge, { backgroundColor: STATUS_COLORS[item.status] + '20' }]}>
+              <Text style={[styles.statusText, { color: STATUS_COLORS[item.status] }]}>
+                {item.status.replace(/_/g, ' ')}
+              </Text>
+            </View>
           </View>
-        )}
-        {item.color && (
-          <View style={styles.detailRow}>
-            <Ionicons name="color-palette-outline" size={14} color="#666" />
-            <Text style={styles.detailText}>{item.color}</Text>
+
+          <View style={styles.carDetails}>
+            {item.vin && (
+              <View style={styles.detailRow}>
+                <Ionicons name="barcode-outline" size={14} color="#666" />
+                <Text style={styles.detailText} numberOfLines={1}>{item.vin}</Text>
+              </View>
+            )}
+            {item.color && (
+              <View style={styles.detailRow}>
+                <Ionicons name="color-palette-outline" size={14} color="#666" />
+                <Text style={styles.detailText}>{item.color}</Text>
+              </View>
+            )}
+            <View style={styles.detailRow}>
+              <Ionicons name="location-outline" size={14} color="#666" />
+              <Text style={styles.detailText}>{item.showroom.name}</Text>
+            </View>
           </View>
-        )}
-        <View style={styles.detailRow}>
-          <Ionicons name="location-outline" size={14} color="#666" />
-          <Text style={styles.detailText}>{item.showroom.name}</Text>
         </View>
       </View>
 
@@ -152,8 +171,13 @@ export default function CarsScreen() {
         </View>
       </View>
 
-      {/* Filter Pills */}
-      <View style={styles.filterContainer}>
+      {/* Filter Pills - Horizontally Scrollable */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.filterScrollView}
+        contentContainerStyle={styles.filterContainer}
+      >
         <TouchableOpacity
           style={[styles.filterPill, filterStatus === 'ALL' && styles.filterPillActive]}
           onPress={() => setFilterStatus('ALL')}
@@ -162,7 +186,7 @@ export default function CarsScreen() {
             All ({cars?.length || 0})
           </Text>
         </TouchableOpacity>
-        {STATUS_OPTIONS.slice(0, 3).map((status) => (
+        {STATUS_OPTIONS.map((status) => (
           <TouchableOpacity
             key={status}
             style={[
@@ -182,7 +206,7 @@ export default function CarsScreen() {
             </Text>
           </TouchableOpacity>
         ))}
-      </View>
+      </ScrollView>
 
       {/* Car List */}
       {filteredCars?.length === 0 && !isLoading ? (
@@ -229,13 +253,16 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     fontSize: 16,
   },
-  filterContainer: {
-    flexDirection: 'row',
-    padding: 12,
-    gap: 8,
+  filterScrollView: {
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    gap: 8,
   },
   filterPill: {
     paddingHorizontal: 12,
@@ -262,7 +289,7 @@ const styles = StyleSheet.create({
   carCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
-    padding: 16,
+    overflow: 'hidden',
     marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -270,19 +297,42 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
+  carContent: {
+    flexDirection: 'row',
+  },
+  carImage: {
+    width: 100,
+    height: 100,
+    backgroundColor: '#f5f5f5',
+  },
+  carImagePlaceholder: {
+    width: 100,
+    height: 100,
+    backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  carInfo: {
+    flex: 1,
+    padding: 12,
+  },
   carHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: 8,
+  },
+  carHeaderText: {
+    flex: 1,
+    marginRight: 8,
   },
   carName: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: '#1a1a1a',
   },
   carYear: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#666',
     marginTop: 2,
   },
@@ -311,8 +361,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    marginTop: 12,
-    paddingTop: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderTopWidth: 1,
     borderTopColor: '#eee',
   },

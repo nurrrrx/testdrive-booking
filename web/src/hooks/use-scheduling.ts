@@ -66,11 +66,15 @@ export function useSetAvailability() {
       availableTo: string;
     }) => schedulingApi.setAvailability(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teamSchedule'] });
+      // Use predicate to invalidate all teamSchedule queries regardless of date params
+      queryClient.invalidateQueries({
+        predicate: (query) => query.queryKey[0] === 'teamSchedule' || query.queryKey[0] === 'mySchedule'
+      });
       toast.success('Availability updated');
     },
-    onError: () => {
-      toast.error('Failed to update availability');
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to update availability';
+      toast.error(message);
     },
   });
 }
@@ -83,11 +87,14 @@ export function useRemoveAvailability() {
     mutationFn: (data: { userId?: string; date: string }) =>
       schedulingApi.removeAvailability(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teamSchedule'] });
+      queryClient.invalidateQueries({
+        predicate: (query) => query.queryKey[0] === 'teamSchedule' || query.queryKey[0] === 'mySchedule'
+      });
       toast.success('Availability removed');
     },
-    onError: () => {
-      toast.error('Failed to remove availability');
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || 'Failed to remove availability';
+      toast.error(message);
     },
   });
 }

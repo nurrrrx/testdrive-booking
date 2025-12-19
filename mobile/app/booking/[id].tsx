@@ -57,6 +57,15 @@ export default function BookingDetailScreen() {
     }
   };
 
+  const handleWhatsApp = () => {
+    if (booking?.customer.phone) {
+      // Remove any non-digit characters and ensure country code
+      const phone = booking.customer.phone.replace(/\D/g, '');
+      const message = `Hi ${booking.customer.firstName}, this is regarding your test drive booking (Ref: ${booking.referenceNumber}) scheduled for ${format(new Date(booking.date), 'MMMM d')} at ${booking.startTime}.`;
+      Linking.openURL(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`);
+    }
+  };
+
   const handleCancel = () => {
     Alert.alert(
       'Cancel Booking',
@@ -118,14 +127,21 @@ export default function BookingDetailScreen() {
             <Text style={styles.customerName}>
               {booking.customer.firstName} {booking.customer.lastName}
             </Text>
-            <Text style={styles.customerPhone}>{booking.customer.phone}</Text>
+            <TouchableOpacity onPress={handleCall}>
+              <Text style={styles.customerPhoneClickable}>{booking.customer.phone}</Text>
+            </TouchableOpacity>
             {booking.customer.email && (
               <Text style={styles.customerEmail}>{booking.customer.email}</Text>
             )}
           </View>
-          <TouchableOpacity style={styles.callButton} onPress={handleCall}>
-            <Ionicons name="call" size={20} color="#fff" />
-          </TouchableOpacity>
+          <View style={styles.contactButtons}>
+            <TouchableOpacity style={styles.callButton} onPress={handleCall}>
+              <Ionicons name="call" size={20} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.whatsappButton} onPress={handleWhatsApp}>
+              <Ionicons name="logo-whatsapp" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
@@ -305,6 +321,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginTop: 2,
+  },
+  customerPhoneClickable: {
+    fontSize: 14,
+    color: '#0066cc',
+    marginTop: 2,
+    textDecorationLine: 'underline',
+  },
+  contactButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  whatsappButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#25D366',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   customerEmail: {
     fontSize: 14,

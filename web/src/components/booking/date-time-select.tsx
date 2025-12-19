@@ -104,11 +104,12 @@ export function DateTimeSelect() {
     }
   };
 
-  // Disable dates in the past and more than 14 days in the future
+  // Disable dates in the past (excluding today) and more than 14 days in the future
   const disabledDays = (date: Date) => {
     const today = startOfDay(new Date());
+    const dateToCheck = startOfDay(date);
     const maxDate = addDays(today, 14);
-    return isBefore(date, today) || date > maxDate;
+    return isBefore(dateToCheck, today) || dateToCheck > maxDate;
   };
 
   const formatCountdown = (seconds: number) => {

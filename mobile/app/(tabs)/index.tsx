@@ -9,6 +9,7 @@ import {
   Alert,
   ScrollView,
   Modal,
+  Linking,
 } from 'react-native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
@@ -87,6 +88,16 @@ export default function BookingsScreen() {
     );
   };
 
+  const handleCall = (phone: string) => {
+    Linking.openURL(`tel:${phone}`);
+  };
+
+  const handleWhatsApp = (booking: Booking) => {
+    const phone = booking.customer.phone.replace(/\D/g, '');
+    const message = `Hi ${booking.customer.firstName}, this is regarding your test drive booking scheduled for ${format(selectedDate, 'MMMM d')} at ${booking.startTime}.`;
+    Linking.openURL(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`);
+  };
+
   // Generate week days for horizontal scroll (3 days before and 7 days after selected)
   const weekDays = useMemo(() => {
     const days = [];
@@ -127,7 +138,23 @@ export default function BookingsScreen() {
         <Text style={styles.customerName}>
           {item.customer.firstName} {item.customer.lastName}
         </Text>
-        <Text style={styles.customerPhone}>{item.customer.phone}</Text>
+        <View style={styles.customerContact}>
+          <TouchableOpacity onPress={() => handleCall(item.customer.phone)}>
+            <Text style={styles.customerPhoneClickable}>{item.customer.phone}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.whatsappMini}
+            onPress={() => handleWhatsApp(item)}
+          >
+            <Ionicons name="logo-whatsapp" size={16} color="#25D366" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.callMini}
+            onPress={() => handleCall(item.customer.phone)}
+          >
+            <Ionicons name="call" size={16} color="#22c55e" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.carInfo}>
@@ -493,6 +520,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginTop: 2,
+  },
+  customerContact: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 2,
+  },
+  customerPhoneClickable: {
+    fontSize: 14,
+    color: '#0066cc',
+    textDecorationLine: 'underline',
+  },
+  whatsappMini: {
+    padding: 4,
+  },
+  callMini: {
+    padding: 4,
   },
   carInfo: {
     flexDirection: 'row',
