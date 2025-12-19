@@ -38,6 +38,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useCarUnits, useUpdateCarUnitStatus, useCarModels } from '@/hooks/use-cars';
+import { VinBarcode } from '@/components/vin-barcode';
 import type { CarUnitStatus } from '@/types';
 
 const statusOptions: { value: CarUnitStatus; label: string; icon: React.ElementType; color: string }[] = [
@@ -199,6 +200,7 @@ export default function CarsPage() {
               <TableRow>
                 <TableHead>Vehicle</TableHead>
                 <TableHead>VIN</TableHead>
+                <TableHead>Barcode</TableHead>
                 <TableHead>Color</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Status</TableHead>
@@ -229,6 +231,9 @@ export default function CarsPage() {
                       <code className="text-xs bg-gray-100 px-2 py-1 rounded">
                         {unit.vin || 'N/A'}
                       </code>
+                    </TableCell>
+                    <TableCell>
+                      {unit.vin && <VinBarcode vin={unit.vin} height={35} width={1} />}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">

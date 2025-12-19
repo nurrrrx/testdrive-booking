@@ -30,6 +30,7 @@ import {
   History,
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { VinBarcode } from '@/components/vin-barcode';
 
 type CheckInType = 'RECEIVED' | 'SENT_OUT' | 'RETURNED' | 'OUT_FOR_DRIVE';
 
@@ -280,8 +281,11 @@ export default function CheckInPage() {
                   <div>Location: {selectedCar.showroom.name}</div>
                 </div>
                 {selectedCar.vin && (
-                  <div className="text-xs text-muted-foreground font-mono">
-                    VIN: {selectedCar.vin}
+                  <div className="flex items-center gap-3 pt-2 border-t">
+                    <div className="text-xs text-muted-foreground font-mono">
+                      VIN: {selectedCar.vin}
+                    </div>
+                    <VinBarcode vin={selectedCar.vin} height={25} width={0.8} />
                   </div>
                 )}
               </div>
