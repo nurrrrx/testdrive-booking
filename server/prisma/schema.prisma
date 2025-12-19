@@ -62,6 +62,13 @@ enum TransferStatus {
   CANCELLED
 }
 
+enum CheckInType {
+  RECEIVED      // Car received at showroom
+  SENT_OUT      // Car sent to another showroom
+  RETURNED      // Car returned from test drive
+  OUT_FOR_DRIVE // Car going out for test drive
+}
+
 enum LeadStatus {
   NEW
   CONTACTED
@@ -109,6 +116,9 @@ model Showroom {
   transfersFrom          CarTransferRequest[] @relation("TransferFrom")
   transfersTo            CarTransferRequest[] @relation("TransferTo")
   leads                  Lead[]               @relation("PreferredShowroom")
+  checkIns               CarCheckIn[]
+  checkInsFrom           CarCheckIn[]         @relation("CheckInFromShowroom")
+  checkInsTo             CarCheckIn[]         @relation("CheckInToShowroom")
 
   @@index([city])
   @@index([isActive])
@@ -155,9 +165,35 @@ model CarUnit {
   showroom         Showroom             @relation(fields: [showroomId], references: [id])
   bookings         Booking[]
   transferRequests CarTransferRequest[]
+  checkInLogs      CarCheckIn[]
 
   @@index([showroomId, status])
   @@index([carModelId])
+  @@index([vin])
+}
+
+model CarCheckIn {
+  id             String      @id @default(uuid())
+  carUnitId      String
+  showroomId     String
+  performedById  String
+  type           CheckInType
+  notes          String?
+  fromShowroomId String?     // For transfers: where the car came from
+  toShowroomId   String?     // For transfers: where the car is going
+  createdAt      DateTime    @default(now())
+
+  // Relations
+  carUnit     CarUnit   @relation(fields: [carUnitId], references: [id])
+  showroom    Showroom  @relation(fields: [showroomId], references: [id])
+  performedBy User      @relation("CheckInPerformedBy", fields: [performedById], references: [id])
+  fromShowroom Showroom? @relation("CheckInFromShowroom", fields: [fromShowroomId], references: [id])
+  toShowroom   Showroom? @relation("CheckInToShowroom", fields: [toShowroomId], references: [id])
+
+  @@index([carUnitId])
+  @@index([showroomId])
+  @@index([performedById])
+  @@index([createdAt])
 }
 
 model User {
@@ -183,6 +219,7 @@ model User {
   transferRequestsCreated     CarTransferRequest[] @relation("TransferRequestedBy")
   transferRequestsApproved    CarTransferRequest[] @relation("TransferApprovedBy")
   assignedLeads               Lead[]               @relation("LeadAssignedTo")
+  checkInsPerformed           CarCheckIn[]         @relation("CheckInPerformedBy")
 
   @@index([role])
   @@index([showroomId])

@@ -26,7 +26,8 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Public } from '../../common/decorators/public.decorator';
-import { UserRole, CarUnitStatus } from '@prisma/client';
+import { UserRole, CarUnitStatus, CheckInType } from '@prisma/client';
+import { CurrentUser, CurrentUserData } from '../../common/decorators/current-user.decorator';
 
 @ApiTags('cars')
 @Controller('cars')
@@ -131,5 +132,111 @@ export class CarsController {
     @Body('status') status: CarUnitStatus,
   ) {
     return this.carsService.updateUnitStatus(id, status);
+  }
+
+  // Car Check-In/Check-Out endpoints
+  @Get('units/vin/:vin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SHOWROOM_MANAGER, UserRole.SALES_EXECUTIVE)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Find car unit by VIN' })
+  async findUnitByVin(@Param('vin') vin: string) {
+    return this.carsService.findUnitByVin(vin);
+  }
+
+  @Post('check-in')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SHOWROOM_MANAGER, UserRole.SALES_EXECUTIVE)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Check in/out a car (receive, send, return, out for drive)' })
+  @ApiResponse({ status: 201, description: 'Check-in recorded successfully' })
+  async checkIn(
+    @CurrentUser() user: CurrentUserData,
+    @Body()
+    body: {
+      carUnitId: string;
+      type: CheckInType;
+      notes?: string;
+      fromShowroomId?: string;
+      toShowroomId?: string;
+    },
+  ) {
+    const showroomId = user.showroomId;
+    if (!showroomId) {
+      throw new Error('User must be assigned to a showroom to perform check-in');
+    }
+
+    return this.carsService.checkIn(
+      body.carUnitId,
+      showroomId,
+      user.id,
+      body.type,
+      body.notes,
+      body.fromShowroomId,
+      body.toShowroomId,
+    );
+  }
+
+  @Post('check-in/vin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SHOWROOM_MANAGER, UserRole.SALES_EXECUTIVE)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Check in/out a car by VIN (receive, send, return, out for drive)' })
+  @ApiResponse({ status: 201, description: 'Check-in recorded successfully' })
+  async checkInByVin(
+    @CurrentUser() user: CurrentUserData,
+    @Body()
+    body: {
+      vin: string;
+      type: CheckInType;
+      notes?: string;
+      fromShowroomId?: string;
+      toShowroomId?: string;
+    },
+  ) {
+    const showroomId = user.showroomId;
+    if (!showroomId) {
+      throw new Error('User must be assigned to a showroom to perform check-in');
+    }
+
+    // Find car by VIN first
+    const carUnit = await this.carsService.findUnitByVin(body.vin);
+
+    return this.carsService.checkIn(
+      carUnit.id,
+      showroomId,
+      user.id,
+      body.type,
+      body.notes,
+      body.fromShowroomId,
+      body.toShowroomId,
+    );
+  }
+
+  @Get('check-in/history')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SHOWROOM_MANAGER)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get check-in history' })
+  @ApiQuery({ name: 'carUnitId', required: false })
+  @ApiQuery({ name: 'showroomId', required: false })
+  @ApiQuery({ name: 'type', required: false, enum: CheckInType })
+  @ApiQuery({ name: 'limit', required: false })
+  async getCheckInHistory(
+    @Query('carUnitId') carUnitId?: string,
+    @Query('showroomId') showroomId?: string,
+    @Query('type') type?: CheckInType,
+    @Query('limit') limit?: string,
+    @CurrentUser() user?: CurrentUserData,
+  ) {
+    const effectiveShowroomId =
+      user?.role === UserRole.SHOWROOM_MANAGER ? user.showroomId : showroomId;
+
+    return this.carsService.getCheckInHistory({
+      carUnitId,
+      showroomId: effectiveShowroomId || undefined,
+      type,
+      limit: limit ? parseInt(limit, 10) : undefined,
+    });
   }
 }

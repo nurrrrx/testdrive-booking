@@ -67,9 +67,31 @@ export const carsApi = {
   getUnits: (params?: { showroomId?: string; carModelId?: string; status?: string }) =>
     api.get('/cars/units', { params }),
   getUnitById: (id: string) => api.get(`/cars/units/${id}`),
+  getUnitByVin: (vin: string) => api.get(`/cars/units/vin/${vin}`),
   createUnit: (data: unknown) => api.post('/cars/units', data),
   updateUnit: (id: string, data: unknown) => api.patch(`/cars/units/${id}`, data),
   updateUnitStatus: (id: string, status: string) => api.patch(`/cars/units/${id}/status`, { status }),
+  // Check-in functionality
+  checkIn: (data: {
+    carUnitId: string;
+    type: 'RECEIVED' | 'SENT_OUT' | 'RETURNED' | 'OUT_FOR_DRIVE';
+    notes?: string;
+    fromShowroomId?: string;
+    toShowroomId?: string;
+  }) => api.post('/cars/check-in', data),
+  checkInByVin: (data: {
+    vin: string;
+    type: 'RECEIVED' | 'SENT_OUT' | 'RETURNED' | 'OUT_FOR_DRIVE';
+    notes?: string;
+    fromShowroomId?: string;
+    toShowroomId?: string;
+  }) => api.post('/cars/check-in/vin', data),
+  getCheckInHistory: (params?: {
+    carUnitId?: string;
+    showroomId?: string;
+    type?: string;
+    limit?: number;
+  }) => api.get('/cars/check-in/history', { params }),
 };
 
 // Availability API

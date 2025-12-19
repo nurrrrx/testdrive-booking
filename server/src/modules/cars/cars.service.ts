@@ -6,7 +6,7 @@ import {
   CreateCarUnitDto,
   UpdateCarUnitDto,
 } from './dto/cars.dto';
-import { CarUnitStatus, FuelType } from '@prisma/client';
+import { CarUnitStatus, FuelType, CheckInType } from '@prisma/client';
 
 @Injectable()
 export class CarsService {
@@ -172,6 +172,115 @@ export class CarsService {
       include: {
         carModel: true,
       },
+    });
+  }
+
+  // Car Check-In/Check-Out functionality
+  async findUnitByVin(vin: string) {
+    const unit = await this.prisma.carUnit.findUnique({
+      where: { vin },
+      include: {
+        carModel: true,
+        showroom: true,
+      },
+    });
+
+    if (!unit) {
+      throw new NotFoundException('Car unit not found with this VIN');
+    }
+
+    return unit;
+  }
+
+  async checkIn(
+    carUnitId: string,
+    showroomId: string,
+    performedById: string,
+    type: CheckInType,
+    notes?: string,
+    fromShowroomId?: string,
+    toShowroomId?: string,
+  ) {
+    const carUnit = await this.findUnitById(carUnitId);
+
+    // Create check-in log
+    const checkIn = await this.prisma.carCheckIn.create({
+      data: {
+        carUnitId,
+        showroomId,
+        performedById,
+        type,
+        notes,
+        fromShowroomId,
+        toShowroomId,
+      },
+      include: {
+        carUnit: {
+          include: { carModel: true },
+        },
+        showroom: true,
+        performedBy: true,
+        fromShowroom: true,
+        toShowroom: true,
+      },
+    });
+
+    // Update car unit status and showroom based on check-in type
+    let newStatus: CarUnitStatus = carUnit.status;
+    let newShowroomId = carUnit.showroomId;
+
+    switch (type) {
+      case CheckInType.RECEIVED:
+        newStatus = CarUnitStatus.AVAILABLE;
+        newShowroomId = showroomId;
+        break;
+      case CheckInType.SENT_OUT:
+        newStatus = CarUnitStatus.IN_TRANSIT;
+        break;
+      case CheckInType.RETURNED:
+        newStatus = CarUnitStatus.AVAILABLE;
+        break;
+      case CheckInType.OUT_FOR_DRIVE:
+        newStatus = CarUnitStatus.OUT_FOR_TEST_DRIVE;
+        break;
+    }
+
+    await this.prisma.carUnit.update({
+      where: { id: carUnitId },
+      data: {
+        status: newStatus,
+        showroomId: newShowroomId,
+      },
+    });
+
+    return checkIn;
+  }
+
+  async getCheckInHistory(filters?: {
+    carUnitId?: string;
+    showroomId?: string;
+    performedById?: string;
+    type?: CheckInType;
+    limit?: number;
+  }) {
+    return this.prisma.carCheckIn.findMany({
+      where: {
+        carUnitId: filters?.carUnitId,
+        showroomId: filters?.showroomId,
+        performedById: filters?.performedById,
+        type: filters?.type,
+      },
+      include: {
+        carUnit: {
+          include: { carModel: true },
+        },
+        showroom: true,
+        performedBy: true,
+        fromShowroom: true,
+        toShowroom: true,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: filters?.limit || 50,
     });
   }
 }

@@ -15,6 +15,7 @@ import {
   CalendarDays,
   LogOut,
   Menu,
+  ScanLine,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -38,6 +39,7 @@ const sidebarNav = [
     items: [
       { href: '/dashboard/schedule', label: 'Team Schedule', icon: CalendarDays },
       { href: '/dashboard/cars', label: 'Car Inventory', icon: Car },
+      { href: '/dashboard/check-in', label: 'Car Check-In', icon: ScanLine },
       { href: '/dashboard/showrooms', label: 'Showrooms', icon: Building2 },
       { href: '/dashboard/users', label: 'Users', icon: Users },
     ],
