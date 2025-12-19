@@ -209,12 +209,21 @@ export default function BookingsScreen() {
           <Text style={styles.headerTitle}>
             {isToday(selectedDate) ? "Today's Bookings" : 'Bookings'}
           </Text>
-          <TouchableOpacity
-            style={styles.calendarButton}
-            onPress={() => setShowCalendar(true)}
-          >
-            <Ionicons name="calendar" size={24} color="#0066cc" />
-          </TouchableOpacity>
+          <View style={styles.headerActions}>
+            <TouchableOpacity
+              style={styles.newBookingButton}
+              onPress={() => router.push('/new-booking')}
+            >
+              <Ionicons name="add" size={20} color="#fff" />
+              <Text style={styles.newBookingText}>New</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.calendarButton}
+              onPress={() => setShowCalendar(true)}
+            >
+              <Ionicons name="calendar" size={24} color="#0066cc" />
+            </TouchableOpacity>
+          </View>
         </View>
         <Text style={styles.headerDate}>{format(selectedDate, 'EEEE, MMMM d, yyyy')}</Text>
       </View>
@@ -417,6 +426,25 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#1a1a1a',
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  newBookingButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#0066cc',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    gap: 4,
+  },
+  newBookingText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fff',
   },
   calendarButton: {
     padding: 8,

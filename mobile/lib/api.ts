@@ -42,6 +42,8 @@ export const authApi = {
 
 // Cars API
 export const carsApi = {
+  getModels: (params?: { brand?: string; fuelType?: string }) =>
+    api.get('/cars/models', { params }),
   getUnits: (params?: { showroomId?: string; carModelId?: string; status?: string }) =>
     api.get('/cars/units', { params }),
   getUnitByVin: (vin: string) => api.get(`/cars/units/vin/${vin}`),
@@ -69,12 +71,33 @@ export const bookingsApi = {
   complete: (id: string, notes?: string) => api.patch(`/bookings/${id}/complete`, { notes }),
   markNoShow: (id: string) => api.patch(`/bookings/${id}/no-show`),
   cancel: (id: string, reason?: string) => api.patch(`/bookings/${id}/cancel`, { reason }),
+  create: (data: {
+    showroomId: string;
+    carModelId?: string;
+    date: string;
+    startTime: string;
+    endTime?: string;
+    customerInfo: {
+      firstName: string;
+      lastName: string;
+      phone: string;
+      email?: string;
+    };
+    source?: 'WEB' | 'MOBILE_APP' | 'WALK_IN' | 'PHONE';
+    notes?: string;
+  }) => api.post('/bookings', data),
 };
 
 // Showrooms API
 export const showroomsApi = {
   getAll: () => api.get('/showrooms'),
   getById: (id: string) => api.get(`/showrooms/${id}`),
+};
+
+// Availability API
+export const availabilityApi = {
+  getSlots: (showroomId: string, date: string, carModelId?: string) =>
+    api.get(`/availability/showrooms/${showroomId}/slots`, { params: { date, carModelId } }),
 };
 
 // Scheduling API

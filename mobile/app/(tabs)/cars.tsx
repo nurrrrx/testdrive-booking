@@ -265,19 +265,22 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   filterPill: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: '#ddd',
+    minHeight: 40,
+    justifyContent: 'center',
   },
   filterPillActive: {
     backgroundColor: '#0066cc',
     borderColor: '#0066cc',
   },
   filterPillText: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#666',
+    lineHeight: 18,
   },
   filterPillTextActive: {
     color: '#fff',

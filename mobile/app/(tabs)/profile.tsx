@@ -93,6 +93,26 @@ export default function ProfileScreen() {
         </View>
       </View>
 
+      {/* Quick Actions */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Quick Actions</Text>
+        <View style={styles.actionsCard}>
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={() => router.push('/schedule')}
+          >
+            <View style={styles.actionIcon}>
+              <Ionicons name="calendar-outline" size={20} color="#0066cc" />
+            </View>
+            <View style={styles.actionContent}>
+              <Text style={styles.actionLabel}>My Schedule</Text>
+              <Text style={styles.actionDescription}>View and manage your availability</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#ccc" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
       {/* Logout Button - Always visible */}
       <View style={styles.logoutContainer}>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
@@ -190,6 +210,38 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#eee',
     marginLeft: 68,
+  },
+  actionsCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+  },
+  actionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#e6f0ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  actionContent: {
+    flex: 1,
+  },
+  actionLabel: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#1a1a1a',
+  },
+  actionDescription: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 2,
   },
   logoutContainer: {
     paddingHorizontal: 16,
